@@ -1,3 +1,4 @@
 .zig-cache/
 zig-out/
 src/days/data/*.txt
+.envrc

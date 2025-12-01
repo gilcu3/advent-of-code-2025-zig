@@ -3,18 +3,31 @@ const std = @import("std");
 // Generic function that creates a day-specific struct type. It can accept
 // parameters which allows compile-time sizing of arrays/maps based on the input
 // constraints.
-fn DayNN(length: usize) type {
+fn DayNN() type {
     return struct {
         // Fields used to store the parsed input or other helpers.
-        words: [length][length]u8 = undefined,
-        allocator: std.mem.Allocator,
+        words: [][]u8 = undefined,
+        allocator: std.mem.Allocator = std.heap.page_allocator,
 
         const Self = @This();
 
         // Constructor: parses the raw input string into structured data. This part is also included
         // in the total runtime of the solution benchmarks.
         fn init(input: []const u8) Self {
+            var self = Self{};
             // Input parsing logic here...
+            var lexer = std.mem.tokenizeScalar(u8, input, '\n');
+            var line_count: usize = 0;
+            while (lexer.next()) |_| {
+                line_count += 1;
+            }
+            self.words = try self.allocator.alloc([]u8, line_count);
+            var i: usize = 0;
+            lexer = std.mem.tokenizeScalar(u8, input, '\n');
+
+            while (lexer.next()) |line| : (i += 1) {
+                self.words[i] = line;
+            }
         }
 
         // Optional cleanup function. Some days require dynamic memory allocation.
@@ -23,19 +36,20 @@ fn DayNN(length: usize) type {
         }
 
         // Part 1 solution.
-        fn part1(self: Self) u64 {}
+        fn part1(self: Self) []const u8 {
+            return std.fmt.allocPrint(self.allocator, "{d}", .{0}) catch unreachable;
+        }
 
         // Part 2 solution.
-        fn part2(self: Self) u64 {}
+        fn part2(self: Self) []const u8 {
+            return std.fmt.allocPrint(self.allocator, "{d}", .{0}) catch unreachable;
+        }
 
         // Miscellaneous helper functions.
         fn helper_function() bool {}
         fn another_helper_function() bool {}
     };
 }
-
-// Title of the puzzle (see the puzzle page).
-pub const title = "Day NN: Puzzle Title";
 
 // Main entry point called by the build system. Runs the solution and measures the time taken.
 pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
@@ -45,7 +59,7 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
     const input = @embedFile("./data/dayNN.txt");
 
     // Create puzzle instance, parse the input, and measure time.
-    const puzzle = DayNN(128).init(input);
+    const puzzle = DayNN().init(input);
     const time0 = timer.read();
 
     // Solve Part 1 and measure time.
@@ -64,23 +78,22 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
 }
 
 // Sample input used for testing. Can be copied directly from the puzzle description.
-const sample_input =
-    \\Sample input from the puzzle description...
-;
+const sample_input = @embedFile("./sample-data/dayNN.txt");
 
 // Unit tests for part 1.
 test "day NN part 1 sample 1" {
     // Create puzzle instance with sample input size
-    const puzzle = DayNN(10).init(sample_input);
+    const puzzle = DayNN().init(sample_input);
     const result = puzzle.part1();
     // Use expected result from puzzle description
-    try std.testing.expectEqual(18, result);
+    const expected_result = "0";
+    try std.testing.expectEqualSlices(u8, expected_result, result);
 }
 
 // Unit tests for part 2.
 test "day NN part 2 sample 1" {
-    const puzzle = DayNN(10).init(sample_input);
+    const puzzle = DayNN().init(sample_input);
     const result = puzzle.part2();
-    try std.testing.expectEqual(9, result);
+    const expected_result = "0";
+    try std.testing.expectEqualSlices(u8, expected_result, result);
 }
-

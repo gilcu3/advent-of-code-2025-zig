@@ -1,3 +1,29 @@
+# 🎄 Advent of Code 2025
+
+Solutions for [Advent of Code](https://adventofcode.com/) in [Zig](https://ziglang.org/).
+
+<!--- advent_readme_stars table --->
+## 2025 Results
+
+| Day | Part 1 | Part 2 |
+| :---: | :---: | :---: |
+| [Day 1](https://adventofcode.com/2025/day/1) | ⭐ | ⭐ |
+<!--- advent_readme_stars table --->
+
+<!--- benchmarking table --->
+## Benchmarks
+
+| Day | Part 1 | Part 2 |
+| :---: | :---: | :---:  |
+
+**Total: 0ms**
+<!--- benchmarking table --->
+
+---
+
+<details>
+<summary>Template readme</summary>
+
 # Advent of Code
 
 This repo contains my solutions for [Advent of Code](https://adventofcode.com). Each solution includes a short write-up explaining my approach.

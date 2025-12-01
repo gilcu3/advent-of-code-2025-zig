@@ -6,7 +6,6 @@ pub fn main() !void {
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    std.debug.print("{s}\n", .{puzzle.title});
     _ = try puzzle.run(allocator, true);
     std.debug.print("\n", .{});
 }
