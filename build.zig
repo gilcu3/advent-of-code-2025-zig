@@ -11,13 +11,16 @@ pub fn build(b: *std.Build) void {
     const day_option = b.option(usize, "ay", "");
 
     for (1..26) |day| {
-        const day_zig_file = b.path(b.fmt("src/days/day{d:0>2}.zig", .{day}));
-
+        const day_zig_file_str = b.fmt("src/days/day{d:0>2}.zig", .{day});
+        const day_zig_file = b.path(day_zig_file_str);
+        if (std.fs.cwd().access(day_zig_file_str, .{ .mode = .read_only }) == error.FileNotFound) {
+            continue;
+        }
         const run_exe = b.addExecutable(.{
             .name = b.fmt("run-day{d:0>2}-Debug", .{day}),
             .root_source_file = b.path("src/run.zig"),
             .target = target,
-            .optimize = optimize, // Defaults to Debug
+            .optimize = optimize,
         });
         run_exe.root_module.addAnonymousImport("day", .{ .root_source_file = day_zig_file });
         b.installArtifact(run_exe);
@@ -26,7 +29,7 @@ pub fn build(b: *std.Build) void {
             .name = b.fmt("bench-day{d:0>2}-Debug", .{day}),
             .root_source_file = b.path("src/bench.zig"),
             .target = target,
-            .optimize = optimize, // Defaults to Debug
+            .optimize = .ReleaseFast,
         });
         bench_exe.root_module.addAnonymousImport("day", .{ .root_source_file = day_zig_file });
         b.installArtifact(bench_exe);

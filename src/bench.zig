@@ -19,7 +19,6 @@ pub fn main() !void {
 
     const total_time = mean_results[0] + mean_results[1] + mean_results[2];
 
-    std.debug.print("{s}\n", .{puzzle.title});
     std.debug.print("| Parsing     | Part 1      | Part 2      | Total       |\n", .{});
     std.debug.print("| ----------- | ----------- | ----------- | ----------- |\n", .{});
     std.debug.print("|{d: >9.0} ns |{d: >9.0} ns |{d: >9.0} ns |{d: >9.0} ns |\n", .{
