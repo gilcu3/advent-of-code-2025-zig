@@ -48,7 +48,7 @@ fn Day01() type {
             return std.fmt.allocPrint(self.allocator, "{d}", .{ans}) catch unreachable;
         }
 
-        fn part2(self: Self) []const u8 {
+        fn part2(self: *Self) []const u8 {
             var ans: u64 = 0;
             var cur: u64 = 50;
             for (0..self.ops.len) |i| {
@@ -102,7 +102,7 @@ test "day 01 part 1 sample 1" {
 }
 
 test "day 01 part 2 sample 1" {
-    const puzzle = try Day01().init(sample_input);
+    var puzzle = try Day01().init(sample_input);
     const result = puzzle.part2();
     const expected_result = "6";
     try std.testing.expectEqualSlices(u8, expected_result, result);
