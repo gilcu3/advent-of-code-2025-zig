@@ -117,7 +117,7 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
     const time2 = timer.read();
 
     if (is_run) {
-        std.debug.print("Part 1: {s}\nPart 2: {s}\n", .{ result1, result2 });
+        std.debug.print("Day 03:\nPart 1: {s}\nPart 2: {s}\n", .{ result1, result2 });
     }
 
     return .{ time0, time1, time2 };

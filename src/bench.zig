@@ -41,7 +41,6 @@ pub fn main() !void {
     std.debug.print("|{s} |{s} |{s} |{s} |\n", .{
         get_human_time(allocator, mean_results[0]), get_human_time(allocator, mean_results[1]), get_human_time(allocator, mean_results[2]), get_human_time(allocator, total_time),
     });
-    std.debug.print("\n", .{});
 }
 
 fn to_f64(x: anytype) f64 {

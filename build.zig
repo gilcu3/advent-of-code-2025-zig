@@ -8,6 +8,9 @@ pub fn build(b: *std.Build) void {
     const bench_all = b.step("bench", "Benchmark all days");
     const test_all = b.step("test", "Test all days");
 
+    var last_run_step: ?*std.Build.Step = null;
+    var last_bench_step: ?*std.Build.Step = null;
+
     const day_option = b.option(usize, "ay", "");
 
     for (1..26) |day| {
@@ -58,13 +61,21 @@ pub fn build(b: *std.Build) void {
 
         if (day_option == null or day_option == day) {
             const run_cmd = b.addRunArtifact(run_exe);
-            run_all.dependOn(&run_cmd.step);
+            if (last_run_step) |last| {
+                run_cmd.step.dependOn(last);
+            }
+            last_run_step = &run_cmd.step;
 
             const bench_cmd = b.addRunArtifact(bench_exe);
-            bench_all.dependOn(&bench_cmd.step);
+            if (last_bench_step) |last| {
+                bench_cmd.step.dependOn(last);
+            }
+            last_bench_step = &bench_cmd.step;
 
             const test_cmd = b.addRunArtifact(unit_test);
             test_all.dependOn(&test_cmd.step);
         }
     }
+    if (last_run_step) |last| run_all.dependOn(last);
+    if (last_bench_step) |last| bench_all.dependOn(last);
 }
