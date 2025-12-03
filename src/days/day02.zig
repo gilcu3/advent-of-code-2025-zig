@@ -33,11 +33,17 @@ fn Day02() type {
             return self;
         }
 
-        fn is_palindrome(self: *Self, n: u64) bool {
-            const digits = std.fmt.allocPrint(self.allocator, "{d}", .{n}) catch unreachable;
-            defer self.allocator.free(digits);
-            if (digits.len % 2 == 0) {
-                const k = digits.len / 2;
+        fn is_palindrome(n: u64) bool {
+            var digits: [30]u8 = .{0} ** 30;
+            var nl: usize = 0;
+            var nn = n;
+            while (nn > 0) {
+                digits[nl] = @intCast(nn % 10);
+                nn /= 10;
+                nl += 1;
+            }
+            if (nl % 2 == 0) {
+                const k = nl / 2;
                 for (0..k) |i| {
                     if (digits[i] != digits[i + k]) {
                         return false;
@@ -49,28 +55,36 @@ fn Day02() type {
             }
         }
 
-        fn part1(self: *Self) []const u8 {
+        fn part1(self: *Self) ![]const u8 {
             var ans: u64 = 0;
+            var tot: u64 = 0;
             for (0..self.left.len) |i| {
                 const ini = self.left[i];
                 const end = self.right[i];
+                tot += end - ini + 1;
                 for (ini..end + 1) |a| {
-                    if (self.is_palindrome(a)) {
+                    if (Self.is_palindrome(a)) {
                         ans += a;
                     }
                 }
             }
 
-            return std.fmt.allocPrint(self.allocator, "{d}", .{ans}) catch unreachable;
+            return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
 
-        fn is_invalid(self: *Self, n: u64) bool {
-            const digits = std.fmt.allocPrint(self.allocator, "{d}", .{n}) catch unreachable;
-            defer self.allocator.free(digits);
-            for (1..digits.len / 2 + 1) |d| {
-                if (digits.len % d == 0) {
+        fn is_invalid(n: u64) bool {
+            var digits: [30]u8 = .{0} ** 30;
+            var nl: usize = 0;
+            var nn = n;
+            while (nn > 0) {
+                digits[nl] = @intCast(nn % 10);
+                nn /= 10;
+                nl += 1;
+            }
+            for (1..nl / 2 + 1) |d| {
+                if (nl % d == 0) {
                     var found = true;
-                    for (0..digits.len - d) |i| {
+                    for (0..nl - d) |i| {
                         if (digits[i] != digits[i + d]) {
                             found = false;
                             break;
@@ -84,19 +98,19 @@ fn Day02() type {
             return false;
         }
 
-        fn part2(self: *Self) []const u8 {
+        fn part2(self: *Self) ![]const u8 {
             var ans: u64 = 0;
             for (0..self.left.len) |i| {
                 const ini = self.left[i];
                 const end = self.right[i];
                 for (ini..end + 1) |a| {
-                    if (self.is_invalid(a)) {
+                    if (Self.is_invalid(a)) {
                         ans += a;
                     }
                 }
             }
 
-            return std.fmt.allocPrint(self.allocator, "{d}", .{ans}) catch unreachable;
+            return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
     };
 }
@@ -108,10 +122,10 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
     var puzzle = try Day02().init(input);
     const time0 = timer.read();
 
-    const result1 = puzzle.part1();
+    const result1 = try puzzle.part1();
     const time1 = timer.read();
 
-    const result2 = puzzle.part2();
+    const result2 = try puzzle.part2();
     const time2 = timer.read();
 
     if (is_run) {
@@ -122,16 +136,16 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
 
 const sample_input = @embedFile("./sample-data/day02.txt");
 
-test "day 01 part 1 sample 1" {
+test "day 02 part 1 sample 1" {
     var puzzle = try Day02().init(sample_input);
-    const result = puzzle.part1();
+    const result = try puzzle.part1();
     const expected_result = "1227775554";
     try std.testing.expectEqualSlices(u8, expected_result, result);
 }
 
-test "day 01 part 2 sample 1" {
+test "day 02 part 2 sample 1" {
     var puzzle = try Day02().init(sample_input);
-    const result = puzzle.part2();
+    const result = try puzzle.part2();
     const expected_result = "4174379265";
     try std.testing.expectEqualSlices(u8, expected_result, result);
 }

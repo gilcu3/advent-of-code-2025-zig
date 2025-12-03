@@ -6,14 +6,14 @@ const std = @import("std");
 fn DayNN() type {
     return struct {
         // Fields used to store the parsed input or other helpers.
-        words: [][]u8 = undefined,
+        words: [][]const u8 = undefined,
         allocator: std.mem.Allocator = std.heap.page_allocator,
 
         const Self = @This();
 
         // Constructor: parses the raw input string into structured data. This part is also included
         // in the total runtime of the solution benchmarks.
-        fn init(input: []const u8) Self {
+        fn init(input: []const u8) !Self {
             var self = Self{};
             // Input parsing logic here...
             var lexer = std.mem.tokenizeScalar(u8, input, '\n');
@@ -21,7 +21,7 @@ fn DayNN() type {
             while (lexer.next()) |_| {
                 line_count += 1;
             }
-            self.words = try self.allocator.alloc([]u8, line_count);
+            self.words = try self.allocator.alloc([]const u8, line_count);
             var i: usize = 0;
             lexer = std.mem.tokenizeScalar(u8, input, '\n');
 
@@ -36,13 +36,15 @@ fn DayNN() type {
         }
 
         // Part 1 solution.
-        fn part1(self: Self) []const u8 {
-            return std.fmt.allocPrint(self.allocator, "{d}", .{0}) catch unreachable;
+        fn part1(self: Self) ![]const u8 {
+            const ans: u64 = 0;
+            return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
 
         // Part 2 solution.
-        fn part2(self: Self) []const u8 {
-            return std.fmt.allocPrint(self.allocator, "{d}", .{0}) catch unreachable;
+        fn part2(self: Self) ![]const u8 {
+            const ans: u64 = 0;
+            return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
 
         // Miscellaneous helper functions.
@@ -59,19 +61,19 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
     const input = @embedFile("./data/dayNN.txt");
 
     // Create puzzle instance, parse the input, and measure time.
-    const puzzle = DayNN().init(input);
+    const puzzle = try DayNN().init(input);
     const time0 = timer.read();
 
     // Solve Part 1 and measure time.
-    const result1 = puzzle.part1();
+    const result1 = try puzzle.part1();
     const time1 = timer.read();
 
     // Solve Part 2 and measure time.
-    const result2 = puzzle.part2();
+    const result2 = try puzzle.part2();
     const time2 = timer.read();
 
     if (is_run) {
-        std.debug.print("Part 1: {d}\nPart 2: {d}\n", .{ result1, result2 });
+        std.debug.print("Part 1: {s}\nPart 2: {s}\n", .{ result1, result2 });
     }
 
     return .{ time0, time1, time2 };
@@ -83,8 +85,8 @@ const sample_input = @embedFile("./sample-data/dayNN.txt");
 // Unit tests for part 1.
 test "day NN part 1 sample 1" {
     // Create puzzle instance with sample input size
-    const puzzle = DayNN().init(sample_input);
-    const result = puzzle.part1();
+    const puzzle = try DayNN().init(sample_input);
+    const result = try puzzle.part1();
     // Use expected result from puzzle description
     const expected_result = "0";
     try std.testing.expectEqualSlices(u8, expected_result, result);
@@ -92,8 +94,8 @@ test "day NN part 1 sample 1" {
 
 // Unit tests for part 2.
 test "day NN part 2 sample 1" {
-    const puzzle = DayNN().init(sample_input);
-    const result = puzzle.part2();
+    const puzzle = try DayNN().init(sample_input);
+    const result = try puzzle.part2();
     const expected_result = "0";
     try std.testing.expectEqualSlices(u8, expected_result, result);
 }

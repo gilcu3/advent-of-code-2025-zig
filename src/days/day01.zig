@@ -31,7 +31,7 @@ fn Day01() type {
             return self;
         }
 
-        fn part1(self: *Self) []const u8 {
+        fn part1(self: *Self) ![]const u8 {
             var ans: u64 = 0;
             var cur: u64 = 50;
             for (0..self.ops.len) |i| {
@@ -45,10 +45,10 @@ fn Day01() type {
                 }
             }
 
-            return std.fmt.allocPrint(self.allocator, "{d}", .{ans}) catch unreachable;
+            return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
 
-        fn part2(self: *Self) []const u8 {
+        fn part2(self: *Self) ![]const u8 {
             var ans: u64 = 0;
             var cur: u64 = 50;
             for (0..self.ops.len) |i| {
@@ -68,7 +68,7 @@ fn Day01() type {
                 ans += times;
             }
 
-            return std.fmt.allocPrint(self.allocator, "{d}", .{ans}) catch unreachable;
+            return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
     };
 }
@@ -80,10 +80,10 @@ pub fn run(_: std.mem.Allocator, is_run: bool) ![3]u64 {
     var puzzle = try Day01().init(input);
     const time0 = timer.read();
 
-    const result1 = puzzle.part1();
+    const result1 = try puzzle.part1();
     const time1 = timer.read();
 
-    const result2 = puzzle.part2();
+    const result2 = try puzzle.part2();
     const time2 = timer.read();
 
     if (is_run) {
@@ -96,14 +96,14 @@ const sample_input = @embedFile("./sample-data/day01.txt");
 
 test "day 01 part 1 sample 1" {
     var puzzle = try Day01().init(sample_input);
-    const result = puzzle.part1();
+    const result = try puzzle.part1();
     const expected_result = "3";
     try std.testing.expectEqualSlices(u8, expected_result, result);
 }
 
 test "day 01 part 2 sample 1" {
     var puzzle = try Day01().init(sample_input);
-    const result = puzzle.part2();
+    const result = try puzzle.part2();
     const expected_result = "6";
     try std.testing.expectEqualSlices(u8, expected_result, result);
 }
