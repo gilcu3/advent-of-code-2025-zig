@@ -2,21 +2,18 @@
 
 Solutions for [Advent of Code](https://adventofcode.com/) in [Zig](https://ziglang.org/).
 
-<!--- advent_readme_stars table --->
-## 2025 Results
-
-| Day | Part 1 | Part 2 |
-| :---: | :---: | :---: |
-| [Day 1](https://adventofcode.com/2025/day/1) | ⭐ | ⭐ |
-<!--- advent_readme_stars table --->
-
 <!--- benchmarking table --->
 ## Benchmarks
 
-| Day | Part 1 | Part 2 |
-| :---: | :---: | :---:  |
+| Parsing     | Part 1      | Part 2      | Total       |
+| ----------- | ----------- | ----------- | ----------- |
+|   53.803 us |   14.773 us |   14.214 us |   82.791 us |
+|    4.814 us |   10.810 ms |   17.114 ms |   27.928 ms |
+|   11.666 us |    9.482 us |  446.002 us |  467.150 us |
+|  226.011 us |   62.998 us |  941.652 us |    1.231 ms |
 
-**Total: 0ms**
+**Total: -**
+
 <!--- benchmarking table --->
 
 ---
