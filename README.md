@@ -14,6 +14,7 @@ Solutions for [Advent of Code](https://adventofcode.com/) in [Zig](https://zigla
 |   43.480 us |    9.274 us |    1.634 us |   54.389 us |
 |   17.183 us |   52.763 us |   19.566 us |   89.511 us |
 |  466.911 us |   79.190 us |  510.542 us |    1.057 ms |
+|   36.955 us |   34.290 ms |   34.300 ms |   68.627 ms |
 
 **Total: -**
 
