@@ -23,10 +23,10 @@ pub fn build(b: *std.Build) !void {
         }
 
         const run_exe = b.addExecutable(.{
-            .name = b.fmt("run-day{d:0>2}-Debug", .{day}),
+            .name = b.fmt("run-day{d:0>2}", .{day}),
             .root_source_file = b.path("src/run.zig"),
             .target = target,
-            .optimize = optimize,
+            .optimize = .ReleaseFast,
         });
         run_exe.root_module.addAnonymousImport("day", .{ .root_source_file = day_zig_file });
         b.installArtifact(run_exe);
