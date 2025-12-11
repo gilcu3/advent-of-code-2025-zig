@@ -8,17 +8,19 @@ Solutions for [Advent of Code](https://adventofcode.com/) in [Zig](https://zigla
 
 | Days        | Parsing     | Part 1      | Part 2      | Total       |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Day  1      |   64.367 us |   18.159 us |   18.540 us |  101.066 us |
-| Day  2      |    5.806 us |   13.004 ms |   19.978 ms |   32.988 ms |
-| Day  3      |   14.759 us |   18.150 us |  491.035 us |  523.944 us |
-| Day  4      |  178.832 us |   77.735 us |    1.121 ms |    1.378 ms |
-| Day  5      |   44.056 us |   40.413 us |    2.586 us |   87.055 us |
-| Day  6      |   23.185 us |   76.378 us |   31.434 us |  130.997 us |
-| Day  7      |  170.971 us |   34.225 us |  204.007 us |  409.203 us |
-| Day  8      |   40.857 us |   40.042 ms |   32.858 ms |   72.940 ms |
-| Day  9      |   13.392 us |   59.056 us |   35.927 ms |   36.000 ms |
+| Day  1      |   65.553 us |   18.257 us |   18.583 us |  102.393 us |
+| Day  2      |    5.999 us |   12.576 ms |   20.111 ms |   32.693 ms |
+| Day  3      |   13.206 us |   16.625 us |  395.717 us |  425.548 us |
+| Day  4      |  218.585 us |   65.374 us |  956.331 us |    1.240 ms |
+| Day  5      |   36.753 us |   34.687 us |    2.259 us |   73.699 us |
+| Day  6      |   19.740 us |   57.579 us |   29.419 us |  106.738 us |
+| Day  7      |  216.154 us |   28.550 us |  238.131 us |  482.835 us |
+| Day  8      |   34.018 us |   33.306 ms |   32.760 ms |   66.100 ms |
+| Day  9      |   13.124 us |   58.730 us |   36.501 ms |   36.572 ms |
+| Day 10      |    2.023 ms |    5.835 ms |   67.750 us |    inf      |
+| Day 11      |  717.825 us |  836.253 us |  916.677 us |    2.471 ms |
 
-**Total:**   144.558 ms
+**Total:**   inf ms
 
 <!--- benchmarking table --->
 
