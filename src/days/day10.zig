@@ -122,157 +122,182 @@ fn Day10() type {
             return try std.fmt.allocPrint(self.allocator, "{d}", .{ans});
         }
 
-        fn binpos(eqs: [][]u32, results: []i32, ii: usize) bool {
-            const n = eqs.len - ii;
-            const total = @as(u32, 1) << @intCast(n);
-            const k = results.len;
-            var tmp: [20]u32 = .{0} ** 20;
-            for (0..total) |mask| {
-                for (0..k) |i| {
-                    tmp[i] = @as(u32, @intCast(results[i])) % 2;
+        fn calcGcd(a: i64, b: i64) i64 {
+            return @intCast(std.math.gcd(@abs(a), @abs(b)));
+        }
+
+        fn calcLcm(a: i64, b: i64) i64 {
+            if (a == 0 or b == 0) return 0;
+            const g = calcGcd(a, b);
+            return @divExact(a, g) * b;
+        }
+
+        fn simplifyRow(row: []i64) !void {
+            var common_divisor: i64 = 0;
+
+            for (row) |val| {
+                if (val == 0) continue;
+                if (common_divisor == 0) {
+                    common_divisor = val;
+                } else {
+                    common_divisor = calcGcd(common_divisor, val);
                 }
-                for (0..n) |i| {
-                    if (((@as(u32, 1) << @intCast(i)) & mask) != 0) {
-                        for (eqs[i + ii]) |a| {
-                            tmp[a] = 1 - tmp[a];
-                        }
-                    }
+            }
+
+            if (common_divisor > 1) {
+                for (0..row.len) |i| {
+                    row[i] = @divExact(row[i], common_divisor);
                 }
-                var good = true;
-                for (0..k) |i| {
-                    if (tmp[i] != 0) {
-                        good = false;
+            }
+        }
+
+        fn rec3(i: usize, n: usize, m: usize, matrix: [][]i64, top: []u32, cur: u32, best: u32) u32 {
+            if (i == m) {
+                var nbest = cur;
+                for (0..n) |j| {
+                    if (matrix[j][j] == 0) {
                         break;
                     }
-                }
-                if (good) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        fn rec(self: Self, eqs: [][]u32, results: []i32, degree: []usize, i: usize, current: u32, best: u32) u32 {
-            if (current > best) {
-                return best;
-            }
-
-            var sum: u32 = 0;
-
-            var mx: u32 = 0;
-
-            for (results) |a| {
-                sum += @intCast(a);
-                mx = @max(mx, @as(u32, @intCast(a)));
-            }
-            if (current + mx > best) {
-                return best;
-            }
-
-            if (sum == 0) {
-                return current;
-            }
-
-            if (i == eqs.len) {
-                return best;
-            }
-            for (0..results.len) |j| {
-                if (results[j] > 0 and degree[j] == 0)
-                    return best;
-            }
-
-            if (!Self.binpos(eqs, results, i)) {
-                return best;
-            }
-
-            var deg1 = false;
-            var val: u32 = 0;
-            for (eqs[i]) |a| {
-                if (degree[a] == 1) {
-                    if (deg1 and val != results[a]) {
+                    if (@mod(matrix[j][m], matrix[j][j]) != 0) return best;
+                    const v = @divExact(matrix[j][m], matrix[j][j]);
+                    if (v < 0 or v > top[j])
                         return best;
-                    }
-                    deg1 = true;
-                    val = @intCast(results[a]);
+                    nbest += @intCast(v);
+                    if (nbest >= best) return best;
                 }
-            }
-            var cbest = best;
-            var a0: usize = 0;
-            var b0: usize = sum;
-            if (deg1) {
-                a0 = val;
-                b0 = val;
+                return nbest;
             }
 
-            for (a0..b0 + 1) |t| {
-                var poss = true;
-                for (eqs[i]) |a| {
-                    results[a] -= @intCast(t);
-                    degree[a] -= 1;
-                    if (results[a] < 0) {
-                        poss = false;
-                    }
+            var nbest: u32 = best;
+            for (0..top[i] + 1) |v| {
+                if (cur + v >= best) break;
+                for (0..n) |j| {
+                    matrix[j][m] -= matrix[j][i] * @as(i64, @intCast(v));
                 }
-                if (poss) {
-                    const cur = self.rec(eqs, results, degree, i + 1, current + @as(u32, @intCast(t)), cbest);
-                    if (cur < cbest) {
-                        cbest = cur;
-                    }
+                const ans = Self.rec3(i + 1, n, m, matrix, top, cur + @as(u32, @intCast(v)), nbest);
+                if (ans < nbest) {
+                    nbest = ans;
                 }
-
-                for (eqs[i]) |a| {
-                    results[a] += @intCast(t);
-                    degree[a] += 1;
+                for (0..n) |j| {
+                    matrix[j][m] += matrix[j][i] * @as(i64, @intCast(v));
                 }
-                if (!poss) break;
             }
 
-            return cbest;
+            return nbest;
         }
 
-        fn compareRanges(_: void, lhs: []u32, rhs: []u32) bool {
-            if (lhs.len != rhs.len) {
-                return lhs.len > rhs.len;
-            }
-            for (0..lhs.len) |i| {
-                if (lhs[i] != rhs[i]) {
-                    return lhs[i] < rhs[i];
+        fn solve2(self: Self, eqs: [][]u32, results: []i32) !u32 {
+            const n = results.len;
+            const m = eqs.len;
+            var matrix: [][]i64 = try self.allocator.alloc([]i64, n);
+
+            var top: []u32 = try self.allocator.alloc(u32, m);
+
+            for (0..m) |i| {
+                top[i] = 10000000;
+                for (eqs[i]) |a| {
+                    top[i] = @min(top[i], @as(u32, @intCast(results[a])));
                 }
             }
-            return false;
+
+            for (0..n) |i| {
+                matrix[i] = try self.allocator.alloc(i64, m + 1);
+                for (0..m) |j| {
+                    matrix[i][j] = 0;
+                }
+                matrix[i][m] = results[i];
+            }
+            for (0..m) |i| {
+                for (eqs[i]) |a| {
+                    matrix[a][i] = 1;
+                }
+            }
+
+            const aug_width = m + 1;
+
+            var used_rows: usize = n;
+            for (0..n) |pivot_idx| {
+                var pivot_row: usize = undefined;
+                var pivot_column: usize = undefined;
+                var finished = true;
+                for (pivot_idx..n) |x| {
+                    for (pivot_idx..m) |y| {
+                        if (matrix[x][y] != 0) {
+                            pivot_row = x;
+                            pivot_column = y;
+                            finished = false;
+                            break;
+                        }
+                    }
+                    if (!finished) break;
+                }
+                if (finished) {
+                    used_rows = pivot_idx;
+                    break;
+                }
+
+                if (pivot_column != pivot_idx) {
+                    for (0..n) |r| {
+                        const temp = matrix[r][pivot_idx];
+                        matrix[r][pivot_idx] = matrix[r][pivot_column];
+                        matrix[r][pivot_column] = temp;
+                    }
+                    const temp = top[pivot_idx];
+                    top[pivot_idx] = top[pivot_column];
+                    top[pivot_column] = temp;
+                }
+
+                if (pivot_row != pivot_idx) {
+                    for (0..aug_width) |c| {
+                        const temp = matrix[pivot_idx][c];
+                        matrix[pivot_idx][c] = matrix[pivot_row][c];
+                        matrix[pivot_row][c] = temp;
+                    }
+                }
+
+                var pivot_val = matrix[pivot_idx][pivot_idx];
+                if (pivot_val < 0) {
+                    for (0..m + 1) |j| {
+                        matrix[pivot_idx][j] *= -1;
+                    }
+                    pivot_val *= -1;
+                }
+
+                for (0..n) |target_row| {
+                    if (target_row == pivot_idx) continue;
+
+                    const target_val = matrix[target_row][pivot_idx];
+                    if (target_val == 0) continue;
+
+                    const common_multiple = calcLcm(pivot_val, target_val);
+                    const pivot_mult = @divExact(common_multiple, pivot_val);
+                    const target_mult = @divExact(common_multiple, target_val);
+
+                    for (0..aug_width) |c| {
+                        const val_t = matrix[target_row][c];
+                        const val_p = matrix[pivot_idx][c];
+                        matrix[target_row][c] = (val_t * target_mult) - (val_p * pivot_mult);
+                    }
+
+                    try simplifyRow(matrix[target_row]);
+                }
+            }
+
+            const ans = Self.rec3(used_rows, n, m, matrix, top, 0, 10000000);
+
+            defer self.allocator.free(matrix);
+            for (0..n) |i| {
+                defer self.allocator.free(matrix[i]);
+            }
+
+            return ans;
         }
 
         // Part 2 solution.
         fn part2(self: Self) ![]const u8 {
             var ans: u32 = 0;
-
-            var degree = try self.allocator.alloc(usize, 20);
-            defer self.allocator.free(degree);
-
             for (0..self.light.len) |t| {
-                const k = self.light[t].len;
-
-                for (0..k) |i| {
-                    degree[i] = 0;
-                }
-                for (0..self.switches[t].len) |i| {
-                    std.mem.sortUnstable(u32, self.switches[t][i], {}, std.sort.asc(u32));
-                    for (self.switches[t][i]) |a| {
-                        degree[a] += 1;
-                    }
-                }
-                std.mem.sortUnstable([]u32, self.switches[t], {}, Self.compareRanges);
-
-                var timer = try std.time.Timer.start();
-                const cur = rec(self, self.switches[t], self.jolts[t], degree, 0, 0, 1000000);
-                const time0 = @as(f64, @floatFromInt(timer.read())) / 1000000000;
-                if (time0 > 1) {
-                    std.debug.print("#{d}\nswitches: {d}\njolts: {any}\n", .{ t, k, self.jolts[t] });
-                    for (0..self.switches[t].len) |i| {
-                        std.debug.print("{any}\n", .{self.switches[t][i]});
-                    }
-                    std.debug.print("{d} {d}\n", .{ time0, cur });
-                }
+                const cur = try self.solve2(self.switches[t], self.jolts[t]);
 
                 ans += cur;
             }
